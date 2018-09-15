@@ -7,10 +7,32 @@
   (add-to-list
    'package-archives
    '("gnu" . "http://elpa.gnu.org/packages/")))
-(add-to-list 'load-path "~/.emacs.d/lisp/oef-mode") ;; Tell emacs where is your personal elisp lib dir
-(load "oef-mode.el") ;; load the packaged named oef-mode
+;;(add-to-list 'load-path "~/.emacs.d/lisp/oef-mode") ;; Tell emacs where is your personal elisp lib dir
+;;(load "oef-mode.el") ;; load the packaged named oef-mode
 
 (package-initialize)
+
+
+;; Bootstrap `use-package'
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+
+(use-package auto-virtualenv   :ensure t)
+(use-package elpy   :ensure t)
+(use-package flx-ido   :ensure t)
+(use-package google-translate   :ensure t)
+(use-package indium  :ensure t)
+(use-package js-comint   :ensure t)
+(use-package multiple-cursors   :ensure t)
+(use-package rainbow-delimiters   :ensure t)
+(use-package rainbow-mode   :ensure t)
+(use-package web-mode   :ensure t)
+(use-package wrap-region   :ensure t)
+(use-package emmet-mode   :ensure t)
+(use-package expand-region  :ensure t)
+
+
 
 ;; FaceList
 ;; List faces using ‘M-x list-faces-display’ and customize them by hitting enter. This is a standard Emacs command.
