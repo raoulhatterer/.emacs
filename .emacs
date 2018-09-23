@@ -129,6 +129,10 @@
 (require 'auto-virtualenv)
 (add-hook 'python-mode-hook 'auto-virtualenv-set-virtualenv)
 
+;;; Block-code in Org-mode
+(setq org-babel-python-command "python3")
+(org-babel-do-load-languages
+ 'org-babel-load-languages '((sh . t)(python . t)(emacs-lisp . t)))
 
 ;;; COMPLETION (better than built-in)
 (require 'flx-ido)
