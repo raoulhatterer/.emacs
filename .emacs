@@ -101,6 +101,10 @@
 ;; Expand Region
 (require 'expand-region)
 (global-set-key (kbd "C-=") 'er/expand-region)
+;; Store Link
+(global-set-key (kbd "C-c l") 'org-store-link)
+
+
 
 ;;; CORRECTION ORTHOGRAPHIQUE
 ;; This is bound to 'C-;' and 'échap TAB'
@@ -133,6 +137,7 @@
 (setq org-babel-python-command "python3")
 (org-babel-do-load-languages
  'org-babel-load-languages '((sh . t)(python . t)(emacs-lisp . t)))
+
 
 ;;; COMPLETION (better than built-in)
 (require 'flx-ido)
