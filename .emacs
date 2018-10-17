@@ -1,38 +1,51 @@
-(require 'package) 
-(add-to-list 'package-archives
-             '("melpa" . "https://melpa.org/packages/"))
+;; el-get Basic Setup with Installation via MELPA	
+(add-to-list 'load-path "~/.emacs.d/el-get/el-get")
 
-(when (< emacs-major-version 24)
-  ;; For important compatibility libraries like cl-lib
-  (add-to-list
-   'package-archives
-   '("gnu" . "http://elpa.gnu.org/packages/")))
-;;(add-to-list 'load-path "~/.emacs.d/lisp/oef-mode") ;; Tell emacs where is your personal elisp lib dir
-;;(load "oef-mode.el") ;; load the packaged named oef-mode
+(unless (require 'el-get nil 'noerror)
+  (require 'package)
+  (add-to-list 'package-archives
+               '("melpa" . "http://melpa.org/packages/"))
+  (package-refresh-contents)
+  (package-initialize)
+  (package-install 'el-get)
+  (require 'el-get))
+
+(add-to-list 'el-get-recipe-path "~/.emacs.d/el-get-user/recipes")
+
+
+(el-get-bundle raoulhatterer/oef-mode
+  :description "Provide oef-mode (Online Exercise Format for wims) to emacs")
+
+;; (:name el-get
+;; :website "https://github.com/dimitri/el-get#readme"
+;; :description "Manage the external elisp bits and pieces you depend upon."
+;; :type github
+;; :branch "4.stable"
+;; :pkgname "dimitri/el-get"
+;; :info "."
+;; :load "el-get.el")
+
+
+(el-get 'sync)
+
+
+;; si l'on n'utilise pas el-get
+;; (require 'package) 
+;; (add-to-list 'package-archives
+;;              '("melpa" . "https://melpa.org/packages/"))
+
+;; (when (< emacs-major-version 24)
+;;   ;; For important compatibility libraries like cl-lib
+;;   (add-to-list
+;;    'package-archives
+;;    '("gnu" . "http://elpa.gnu.org/packages/")))
+
+;; si l'on utilise pas 'cask' ou el-get faire:
+(add-to-list 'load-path "~/.emacs.d/lisp/oef-mode") ;; Tell emacs where is your personal elisp lib dir
+(load "oef-mode.el") ;; load the packaged named oef-mode
+					;ou alors utiliser cask
 
 (package-initialize)
-
-
-;; Bootstrap `use-package'
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
-
-(use-package auto-virtualenv   :ensure t)
-(use-package elpy   :ensure t)
-(use-package flx-ido   :ensure t)
-(use-package google-translate   :ensure t)
-(use-package indium  :ensure t)
-(use-package js-comint   :ensure t)
-(use-package multiple-cursors   :ensure t)
-(use-package rainbow-delimiters   :ensure t)
-(use-package rainbow-mode   :ensure t)
-(use-package web-mode   :ensure t)
-(use-package wrap-region   :ensure t)
-(use-package emmet-mode   :ensure t)
-(use-package expand-region  :ensure t)
-
-
 
 ;; FaceList
 ;; List faces using ‘M-x list-faces-display’ and customize them by hitting enter. This is a standard Emacs command.
@@ -44,11 +57,16 @@
  ;; If there is more than one, they won't work right.
  '(debug-on-error t)
  '(global-company-mode t)
+ '(org-mobile-directory "~/Dropbox/Applications/MobileOrg")
  '(package-selected-packages
    (quote
-    (wrap-region corral company-web company-jedi company-math company-auctex yafolding auto-virtualenv jquery-doc exec-path-from-shell indium js-comint quickrun flycheck noctilux-theme pdf-tools zone-rainbow xah-find web-mode use-package tidy rainbow-mode rainbow-identifiers rainbow-delimiters rainbow-blocks python projectile-git-autofetch projectile-codesearch org multiple-cursors multi-web-mode magit magic-latex-buffer keychain-environment jedi hydandata-light-theme hlinum google-translate git-link git-auto-commit-mode flx-isearch flx-ido find-file-in-repository embrace elpy egg diredful dired-rainbow dired-k dired+ clues-theme basic-theme aurora-theme auctex ample-zen-theme alect-themes ac-html ac-emmet)))
+    (pacmacs package-lint wrap-region corral company-web company-jedi company-math company-auctex yafolding auto-virtualenv jquery-doc exec-path-from-shell indium js-comint quickrun flycheck noctilux-theme pdf-tools zone-rainbow xah-find web-mode use-package tidy rainbow-mode rainbow-identifiers rainbow-delimiters rainbow-blocks python projectile-git-autofetch projectile-codesearch org multiple-cursors multi-web-mode magit magic-latex-buffer keychain-environment jedi hydandata-light-theme hlinum google-translate git-link git-auto-commit-mode flx-isearch flx-ido find-file-in-repository embrace elpy egg diredful dired-rainbow dired-k dired+ clues-theme basic-theme aurora-theme auctex ample-zen-theme alect-themes ac-html ac-emmet)))
  '(save-place t)
- '(show-paren-mode t))
+ '(show-paren-mode t)
+ '(web-mode-tests-directory "~/tests/")
+ '(yas-snippet-dirs
+   (quote
+    ("/home/hatterer/.emacs.d/snippets" "/home/hatterer/.emacs.d/elpa/elpy-20180728.932/snippets/"))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -62,12 +80,61 @@
 ;;  Typed text replaces the selection if the selection is active
 (delete-selection-mode 1)
 
+;; I like to see an outline of pretty bullets instead of a list of asterisks.
+(use-package org-bullets
+  :init
+  (add-hook 'org-mode-hook #'org-bullets-mode))
+;; I like seeing a little downward-pointing arrow instead of the usual ellipsis (...) that org displays when there’s stuff under a header.
+(setq org-ellipsis "⤵")
+
+;; Use syntax highlighting in source blocks while editing.
+(setq org-src-fontify-natively t)
+
+;; Make TAB act as if it were issued in a buffer of the language’s major mode.
+(setq org-src-tab-acts-natively t)
+
+;; When editing a code snippet, use the current window rather than popping open a new one (which shows the same information).
+(setq org-src-window-setup 'current-window)
+
+
+;; Allow export to markdown and beamer (for presentations).
+(require 'ox-md)
+(require 'ox-beamer)
+
+;; Exporting to PDF
+
+;; I want to produce PDFs with syntax highlighting in the code. The best way to do that seems to be with the minted package, but that package shells out to pygments to do the actual work. pdflatex usually disallows shell commands; this enables that.
+
+(setq org-latex-pdf-process
+      '("xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+        "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+        "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+
+;; Include the minted package in all of my LaTeX exports. 
+(add-to-list 'org-latex-packages-alist '("" "minted"))
+(setq org-latex-listings 'minted)
+
+
+
+
+;; Store a link to the current location
+(global-set-key (kbd "C-c l")     'org-store-link)
+;; To enable python and gnuplot in org-mode 'src' code blocs 
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((python . t)
+   (gnuplot .t)))
+
+;; Don’t ask before evaluating code blocks.
+(setq org-confirm-babel-evaluate nil)
+ 
+
 ;; Flycheck automatically checks buffers for errors while you type, and reports
 ;; warnings and errors directly in the buffer and in an optional IDE-like error
 ;; list.
 (add-hook 'after-init-hook 'global-flycheck-mode)
 
-; '(flyspell-default-dictionary "english")
+;; '(flyspell-default-dictionary "english")
 ;; Change Flyspell dictionary with F6 
 (let ((langs '("english" "francais")))
   (setq lang-ring (make-ring (length langs)))
@@ -101,10 +168,6 @@
 ;; Expand Region
 (require 'expand-region)
 (global-set-key (kbd "C-=") 'er/expand-region)
-;; Store Link
-(global-set-key (kbd "C-c l") 'org-store-link)
-
-
 
 ;;; CORRECTION ORTHOGRAPHIQUE
 ;; This is bound to 'C-;' and 'échap TAB'
@@ -132,11 +195,6 @@
 
 (require 'auto-virtualenv)
 (add-hook 'python-mode-hook 'auto-virtualenv-set-virtualenv)
-
-;;; Block-code in Org-mode
-(setq org-babel-python-command "python3")
-(org-babel-do-load-languages
- 'org-babel-load-languages '((sh . t)(python . t)(emacs-lisp . t)))
 
 
 ;;; COMPLETION (better than built-in)
@@ -181,11 +239,26 @@
 (add-to-list 'auto-mode-alist '("\\.css?\\'" . web-mode))
 
 ;;; EMMET-MODE
+(defvar emmet-mode-keymap
+  (let
+      ((map (make-sparse-keymap)))
+    (define-key map (kbd "C-j") 'emmet-expand-line)
+    (define-key map (kbd "<C-return>") 'emmet-expand-line)
+    (define-key map (kbd "<C-M-right>") 'emmet-next-edit-point)
+    (define-key map (kbd "<C-M-left>") 'emmet-prev-edit-point)
+;;    (define-key map (kbd "C-c C-c w") 'emmet-wrap-with-markup)
+    map)
+  "Keymap for emmet minor mode.")
+
+
+
 (require 'emmet-mode)
 (add-hook 'sgml-mode-hook 'emmet-mode) ;; Auto-start on any markup modes
 (add-hook 'html-mode-hook 'emmet-mode)
 (add-hook 'css-mode-hook  'emmet-mode)
 (add-hook 'web-mode-hook  'emmet-mode)
+
+
 
 ;;; RAINBOW-DELIMITERS
 (require 'rainbow-delimiters)
