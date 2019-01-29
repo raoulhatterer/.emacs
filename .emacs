@@ -1,10 +1,13 @@
 ;; el-get Basic Setup with Installation via MELPA	
 (add-to-list 'load-path "~/.emacs.d/el-get/el-get")
 
+
+
+
 (unless (require 'el-get nil 'noerror)
   (require 'package)
   (add-to-list 'package-archives
-               '("melpa" . "http://melpa.org/packages/"))
+	       '("melpa" . "http://melpa.org/packages/"))
   (package-refresh-contents)
   (package-initialize)
   (package-install 'el-get)
@@ -13,8 +16,8 @@
 (add-to-list 'el-get-recipe-path "~/.emacs.d/el-get-user/recipes")
 
 
-(el-get-bundle raoulhatterer/oef-mode
-  :description "Provide oef-mode (Online Exercise Format for wims) to emacs")
+;; (el-get-bundle raoulhatterer/oef-mode
+;;   :description "Provide oef-mode (Online Exercise Format for wims) to emacs")
 
 ;; (:name el-get
 ;; :website "https://github.com/dimitri/el-get#readme"
@@ -30,25 +33,33 @@
 
 
 ;; si l'on n'utilise pas el-get
-;; (require 'package) 
-;; (add-to-list 'package-archives
-;;              '("melpa" . "https://melpa.org/packages/"))
+(require 'package) 
+(add-to-list 'package-archives
+             '("melpa" . "https://melpa.org/packages/"))
 
-;; (when (< emacs-major-version 24)
-;;   ;; For important compatibility libraries like cl-lib
-;;   (add-to-list
-;;    'package-archives
-;;    '("gnu" . "http://elpa.gnu.org/packages/")))
+(when (< emacs-major-version 24)
+  ;; For important compatibility libraries like cl-lib
+  (add-to-list
+   'package-archives
+   '("gnu" . "http://elpa.gnu.org/packages/")))
 
 ;; si l'on utilise pas 'cask' ou el-get faire:
 (add-to-list 'load-path "~/.emacs.d/lisp/oef-mode") ;; Tell emacs where is your personal elisp lib dir
 (load "oef-mode.el") ;; load the packaged named oef-mode
-					;ou alors utiliser cask
+;ou alors utiliser cask
 
 (package-initialize)
 
+(load-library "iso-transl") ; pour avoir l'accent circonflexe
+;; (require 'sr-speedbar)
+;; (sr-speedbar-open)
+
 ;; FaceList
 ;; List faces using ‘M-x list-faces-display’ and customize them by hitting enter. This is a standard Emacs command.
+
+(require 'company)
+(add-hook 'after-init-hook 'global-company-mode)
+;; global activation of the unicode symbol completion 
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -56,17 +67,30 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(debug-on-error t)
+ '(elpy-rpc-python-command "python3")
  '(global-company-mode t)
+ '(global-display-line-numbers-mode t)
+ '(initial-scratch-message
+   ";; This buffer is for text that is not saved, and for Lisp evaluation.
+;; To create a file, visit it with \\[find-file] and enter text in its buffer.
+;; M-x sr-speedbar-open to open the speedbar menu sr-speedbar-close to close it.
+")
+ '(org-format-latex-options
+   (quote
+    (:foreground default :background default :scale 1.2 :html-foreground "Black" :html-background "Transparent" :html-scale 1.0 :matchers
+		 ("begin" "$1" "$" "$$" "\\(" "\\["))))
  '(org-mobile-directory "~/Dropbox/Applications/MobileOrg")
+ '(org-src-preserve-indentation t)
  '(package-selected-packages
    (quote
-    (pacmacs package-lint wrap-region corral company-web company-jedi company-math company-auctex yafolding auto-virtualenv jquery-doc exec-path-from-shell indium js-comint quickrun flycheck noctilux-theme pdf-tools zone-rainbow xah-find web-mode use-package tidy rainbow-mode rainbow-identifiers rainbow-delimiters rainbow-blocks python projectile-git-autofetch projectile-codesearch org multiple-cursors multi-web-mode magit magic-latex-buffer keychain-environment jedi hydandata-light-theme hlinum google-translate git-link git-auto-commit-mode flx-isearch flx-ido find-file-in-repository embrace elpy egg diredful dired-rainbow dired-k dired+ clues-theme basic-theme aurora-theme auctex ample-zen-theme alect-themes ac-html ac-emmet)))
+    (yasnippet-classic-snippets yasnippet-snippets django-snippets common-lisp-snippets sr-speedbar django-mode markdown-mode markdown-mode+ markdown-preview-eww markdown-preview-mode pacmacs package-lint wrap-region corral company-web company-jedi company-math company-auctex yafolding auto-virtualenv jquery-doc exec-path-from-shell indium js-comint quickrun flycheck noctilux-theme pdf-tools zone-rainbow xah-find web-mode use-package tidy rainbow-mode rainbow-identifiers rainbow-delimiters rainbow-blocks python projectile-git-autofetch projectile-codesearch org multiple-cursors multi-web-mode magit magic-latex-buffer keychain-environment jedi hydandata-light-theme hlinum google-translate git-link git-auto-commit-mode flx-isearch flx-ido find-file-in-repository embrace elpy egg diredful dired-rainbow dired-k dired+ clues-theme basic-theme aurora-theme auctex ample-zen-theme alect-themes ac-html ac-emmet)))
  '(save-place t)
  '(show-paren-mode t)
+ '(tool-bar-mode nil)
  '(web-mode-tests-directory "~/tests/")
  '(yas-snippet-dirs
    (quote
-    ("/home/hatterer/.emacs.d/snippets" "/home/hatterer/.emacs.d/elpa/elpy-20180728.932/snippets/"))))
+    ("/home/hatterer/.emacs.d/snippets" "/home/hatterer/.emacs.d/elpa/elpy-20181228.1721/snippets/"))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -79,6 +103,12 @@
 
 ;;  Typed text replaces the selection if the selection is active
 (delete-selection-mode 1)
+
+
+;; YASNIPPET
+(require 'yasnippet)
+(yas-global-mode 1)
+
 
 ;; I like to see an outline of pretty bullets instead of a list of asterisks.
 (use-package org-bullets
@@ -98,12 +128,35 @@
 
 
 ;; Allow export to markdown and beamer (for presentations).
+(require 'org)
 (require 'ox-md)
+(require 'ox-latex)
 (require 'ox-beamer)
+
+;; You must define a beamer class in org-latex-export-classes: 
+(eval-after-load "ox-latex"
+
+  ;; update the list of LaTeX classes and associated header (encoding, etc.)
+  ;; and structure
+  '(add-to-list 'org-latex-classes
+                `("beamer"
+                  ,(concat "\\documentclass[presentation]{beamer}\n"
+                           "[DEFAULT-PACKAGES]"
+                           "[PACKAGES]"
+                           "[EXTRA]\n")
+                  ("\\section{%s}" . "\\section*{%s}")
+                  ("\\subsection{%s}" . "\\subsection*{%s}")
+                  ("\\subsubsection{%s}" . "\\subsubsection*{%s}"))))
+
+;; For nice code blocks, use Listings instead of Verbatim:
+
+(setq org-latex-listings t)
+    
 
 ;; Exporting to PDF
 
 ;; I want to produce PDFs with syntax highlighting in the code. The best way to do that seems to be with the minted package, but that package shells out to pygments to do the actual work. pdflatex usually disallows shell commands; this enables that.
+
 
 (setq org-latex-pdf-process
       '("xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
@@ -119,15 +172,26 @@
 
 ;; Store a link to the current location
 (global-set-key (kbd "C-c l")     'org-store-link)
+
 ;; To enable python and gnuplot in org-mode 'src' code blocs 
 (org-babel-do-load-languages
  'org-babel-load-languages
  '((python . t)
-   (gnuplot .t)))
+   (gnuplot .t)
+   (latex.t)))
+
+
+(setq org-latex-create-formula-image-program 'dvipng)
 
 ;; Don’t ask before evaluating code blocks.
 (setq org-confirm-babel-evaluate nil)
  
+
+;;  Shades the background of regular blocks, and colors source blocks only for Python and Emacs-Lisp languages.
+(require 'color)
+(set-face-attribute 'org-block nil :background
+                    (color-darken-name
+                     (face-attribute 'default :background) 4))
 
 ;; Flycheck automatically checks buffers for errors while you type, and reports
 ;; warnings and errors directly in the buffer and in an optional IDE-like error
@@ -192,9 +256,19 @@
 
 ;;; PYTHON
 (elpy-enable)
+(setq python-shell-interpreter "/usr/bin/python3")
+(define-key yas-minor-mode-map (kbd "C-c k") 'yas-expand)
+
 
 (require 'auto-virtualenv)
 (add-hook 'python-mode-hook 'auto-virtualenv-set-virtualenv)
+
+
+(require 'virtualenvwrapper)
+(venv-initialize-interactive-shells) ;; if you want interactive shell support
+(venv-initialize-eshell) ;; if you want eshell support
+(setq venv-location "/home/hatterer/.virtualenvs/")
+
 
 
 ;;; COMPLETION (better than built-in)
@@ -246,7 +320,7 @@
     (define-key map (kbd "<C-return>") 'emmet-expand-line)
     (define-key map (kbd "<C-M-right>") 'emmet-next-edit-point)
     (define-key map (kbd "<C-M-left>") 'emmet-prev-edit-point)
-;;    (define-key map (kbd "C-c C-c w") 'emmet-wrap-with-markup)
+    (define-key map (kbd "C-c w") 'emmet-wrap-with-markup)
     map)
   "Keymap for emmet minor mode.")
 
@@ -272,6 +346,8 @@
 ;;; WRAP-REGION-MODE
 (require 'wrap-region)
 (add-hook 'oef-mode-hook 'wrap-region-mode)
+
+
 
 
 ;;; LATEX XETEX (synchronization with evince)
