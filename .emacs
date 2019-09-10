@@ -3,7 +3,6 @@
 
 
 
-
 (unless (require 'el-get nil 'noerror)
   (require 'package)
   (add-to-list 'package-archives
@@ -50,6 +49,9 @@
 
 (package-initialize)
 
+(define-coding-system-alias 'UTF-8  'utf-8)
+
+
 (load-library "iso-transl") ; pour avoir l'accent circonflexe
 ;; (require 'sr-speedbar)
 ;; (sr-speedbar-open)
@@ -66,37 +68,44 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(blink-cursor-blinks 2)
+ '(blink-cursor-delay 1)
+ '(blink-cursor-interval 0.1)
  '(debug-on-error t)
+ '(elpy-modules
+   (quote
+    (elpy-module-company elpy-module-eldoc elpy-module-pyvenv elpy-module-highlight-indentation elpy-module-yasnippet elpy-module-django elpy-module-sane-defaults)))
  '(elpy-rpc-python-command "python3")
  '(global-company-mode t)
- '(global-display-line-numbers-mode t)
+ '(indent-tabs-mode nil)
  '(initial-scratch-message
    ";; This buffer is for text that is not saved, and for Lisp evaluation.
 ;; To create a file, visit it with \\[find-file] and enter text in its buffer.
 ;; M-x sr-speedbar-open to open the speedbar menu sr-speedbar-close to close it.
-")
+;; C-x C-f /sudo::/path/to/file")
  '(org-format-latex-options
    (quote
     (:foreground default :background default :scale 1.2 :html-foreground "Black" :html-background "Transparent" :html-scale 1.0 :matchers
-		 ("begin" "$1" "$" "$$" "\\(" "\\["))))
+                 ("begin" "$1" "$" "$$" "\\(" "\\["))))
  '(org-mobile-directory "~/Dropbox/Applications/MobileOrg")
- '(org-src-preserve-indentation t)
+ '(org-plantuml-jar-path "~/.emacs.d/plantuml.jar")
+ '(org-src-preserve-indentation nil)
  '(package-selected-packages
    (quote
-    (yasnippet-classic-snippets yasnippet-snippets django-snippets common-lisp-snippets sr-speedbar django-mode markdown-mode markdown-mode+ markdown-preview-eww markdown-preview-mode pacmacs package-lint wrap-region corral company-web company-jedi company-math company-auctex yafolding auto-virtualenv jquery-doc exec-path-from-shell indium js-comint quickrun flycheck noctilux-theme pdf-tools zone-rainbow xah-find web-mode use-package tidy rainbow-mode rainbow-identifiers rainbow-delimiters rainbow-blocks python projectile-git-autofetch projectile-codesearch org multiple-cursors multi-web-mode magit magic-latex-buffer keychain-environment jedi hydandata-light-theme hlinum google-translate git-link git-auto-commit-mode flx-isearch flx-ido find-file-in-repository embrace elpy egg diredful dired-rainbow dired-k dired+ clues-theme basic-theme aurora-theme auctex ample-zen-theme alect-themes ac-html ac-emmet)))
+    (popup-kill-ring avy helm switch-window which-key web-mode all-the-icons dashboard realgud-rdb2 evil-numbers flycheck-plantuml pytest realgud company-arduino arduino-mode yasnippet-classic-snippets django-snippets common-lisp-snippets sr-speedbar django-mode markdown-mode+ markdown-preview-eww markdown-preview-mode pacmacs wrap-region corral company-web company-jedi company-math company-auctex yafolding auto-virtualenv jquery-doc exec-path-from-shell js-comint quickrun noctilux-theme zone-rainbow xah-find tidy rainbow-mode rainbow-identifiers rainbow-delimiters rainbow-blocks python projectile-git-autofetch projectile-codesearch org multi-web-mode magic-latex-buffer keychain-environment jedi hydandata-light-theme hlinum git-auto-commit-mode flx-isearch flx-ido find-file-in-repository embrace elpy egg diredful dired-rainbow dired-k dired+ clues-theme basic-theme aurora-theme auctex ample-zen-theme alect-themes ac-html ac-emmet)))
+ '(plantuml-jar-path "~/.emacs.d/plantuml.jar")
+ '(python-shell-interpreter "python3")
  '(save-place t)
  '(show-paren-mode t)
  '(tool-bar-mode nil)
  '(web-mode-tests-directory "~/tests/")
- '(yas-snippet-dirs
-   (quote
-    ("/home/hatterer/.emacs.d/snippets" "/home/hatterer/.emacs.d/elpa/elpy-20181228.1721/snippets/"))))
+ '(yas-snippet-dirs (quote (yasnippet-classic-snippets-dir))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(org-block ((t (:inherit shadow :background "#ffffbb")))))
 
 ;; Save M-x history
 (savehist-mode 1)
@@ -105,11 +114,121 @@
 (delete-selection-mode 1)
 
 
+
+;;; EVIL NUMBERS                            
+;; Increment / Decrement binary, octal, decimal and hex literals with shift next and prior page.
+;; Works like C-a/C-x in vim, i.e. searches for number up to eol and then increments or decrements and keep zero padding up (unlike in vim)
+;; When a region is active, as in evil’s visual mode, all the numbers within that region will be incremented/decremented (unlike in vim)
+(require 'evil-numbers)
+(global-set-key (kbd "<S-prior>") 'evil-numbers/inc-at-pt)
+(global-set-key (kbd "<S-next>") 'evil-numbers/dec-at-pt)
+
+;;; PROJECTILE
+(use-package projectile
+  :ensure t
+  :init
+  (projectile-mode 1)
+  (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
+  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+  )
+
+;;; WHICH-KEY
+(use-package which-key
+  :ensure t
+  :config
+    (which-key-mode))
+
+;;; SWITCH-WINDOW
+(use-package switch-window
+  :ensure t
+  :config
+  (setq switch-window-input-style 'minibuffer)
+  (setq switch-window-increase 4)
+  (setq switch-window-threshold 2)
+  (setq switch-window-shortcut-style 'qwerty)
+  (setq switch-window-qwerty-shortcuts
+        '("q" "s" "d" "f" "j" "k" "l" "m"))
+  :bind
+  ([remap other-window] . switch-window))
+
+(defun split-and-follow-horizontally ()
+  (interactive)
+  (split-window-below)
+  (balance-windows)
+  (other-window 1))
+
+(global-set-key (kbd "C-x 2") 'split-and-follow-horizontally)
+
+(defun split-and-follow-vertically ()
+  (interactive)
+  (split-window-right)
+  (balance-windows)
+  (other-window 1))
+
+(global-set-key (kbd "C-x 3") 'split-and-follow-vertically)
+
+;;; AVY
+(use-package avy
+  :ensure t
+  :bind
+    ("M-s" . avy-goto-char))
+
+
+;;; ELECTRIC-PAIR-PAIRS
+(setq electric-pair-pairs '(
+                            (?\{ . ?\})
+                            (?\( . ?\))
+                            (?\[ . ?\])
+                            (?\" . ?\")
+                            ))
+(electric-pair-mode t)
+
+;;; POPUP-KILL-RING
+(use-package popup-kill-ring
+  :ensure t
+  :bind ("M-y" . popup-kill-ring))
+
+;;; DASHBOARD
+(use-package dashboard
+  :ensure t
+  :config
+  (dashboard-setup-startup-hook)
+  (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
+                                        ; To add icons to the widget headings and their items:
+  (setq dashboard-set-heading-icons t)
+  (setq dashboard-set-file-icons t)
+  (dashboard-modify-heading-icons '((recents . "file-text")
+                                    (bookmarks . "book")))
+                                        ; To show navigator below the banner:
+  (setq dashboard-set-navigator t)
+  ;; Format: "(icon title help action face prefix suffix)"
+  (setq dashboard-navigator-buttons
+        `(;; line1
+          ((,(all-the-icons-octicon "mark-github" :height 1.1 :v-adjust 0.0)
+            "Homepage"
+            "Browse homepage"
+            (lambda (&rest _) (browse-url "homepage")))
+           ("★" "Star" "Show stars" (lambda (&rest _) (show-stars)) warning)
+           ("?" "" "?/h" #'show-help nil "<" ">"))
+          ;; line 2
+          ((,(all-the-icons-faicon "linkedin" :height 1.1 :v-adjust 0.0)
+            "Linkedin"
+            ""
+            (lambda (&rest _) (browse-url "homepage")))
+           ("⚑" nil "Show flags" (lambda (&rest _) (message "flag")) error))))
+  (setq dashboard-items '((recents  . 5)
+                          (bookmarks . 5)
+                          (projects . 5)
+                          (agenda . 5)
+                          (registers . 5)))
+  )
+
+
 ;; YASNIPPET
 (require 'yasnippet)
 (yas-global-mode 1)
 
-
+;; ORG-MODE
 ;; I like to see an outline of pretty bullets instead of a list of asterisks.
 (use-package org-bullets
   :init
@@ -125,7 +244,6 @@
 
 ;; When editing a code snippet, use the current window rather than popping open a new one (which shows the same information).
 (setq org-src-window-setup 'current-window)
-
 
 ;; Allow export to markdown and beamer (for presentations).
 (require 'org)
@@ -173,15 +291,27 @@
 ;; Store a link to the current location
 (global-set-key (kbd "C-c l")     'org-store-link)
 
-;; To enable python and gnuplot in org-mode 'src' code blocs 
+
+;; image size in preview
+(setq org-image-actual-width 300)
+
+
+
+;; To enable python, gnuplot,... in org-mode 'src' code blocs
+;; shortcut c-c c-,
 (org-babel-do-load-languages
  'org-babel-load-languages
  '((python . t)
    (gnuplot .t)
-   (latex.t)))
+   (latex.t)
+   (shell . t)
+   (ditaa .t)
+   (plantuml .t)
+   (arduino .t)))
 
 
-(setq org-latex-create-formula-image-program 'dvipng)
+
+(setq org-latex-create-formula-image-program 'imagemagick)
 
 ;; Don’t ask before evaluating code blocks.
 (setq org-confirm-babel-evaluate nil)
@@ -189,14 +319,11 @@
 
 ;;  Shades the background of regular blocks, and colors source blocks only for Python and Emacs-Lisp languages.
 (require 'color)
-(set-face-attribute 'org-block nil :background
-                    (color-darken-name
-                     (face-attribute 'default :background) 4))
 
-;; Flycheck automatically checks buffers for errors while you type, and reports
-;; warnings and errors directly in the buffer and in an optional IDE-like error
-;; list.
-(add-hook 'after-init-hook 'global-flycheck-mode)
+;; (set-face-attribute 'org-block nil :background
+;;                     (color-darken-name
+;;                      (face-attribute 'default :background) 4))
+
 
 ;; '(flyspell-default-dictionary "english")
 ;; Change Flyspell dictionary with F6 
@@ -239,7 +366,8 @@
 
 
 ;;; TRADUCTION
-(require 'google-translate)
+(use-package google-translate
+  :ensure t)
 (require 'google-translate-smooth-ui)
 (global-set-key "\C-ct" 'google-translate-smooth-translate)
 (setq google-translate-translation-directions-alist
@@ -252,23 +380,38 @@
 
 ;;; javascript
 (require 'js-comint)
-(require 'indium)
+(use-package indium
+  :ensure t)
+
+
 
 ;;; PYTHON
 (elpy-enable)
-(setq python-shell-interpreter "/usr/bin/python3")
 (define-key yas-minor-mode-map (kbd "C-c k") 'yas-expand)
+
+;; (with-eval-after-load 'python
+;;   (defun python-shell-completion-native-try ()
+;;     "Return non-nil if can trigger native completion."
+;;     (let ((python-shell-completion-native-enable t)
+;;           (python-shell-completion-native-output-timeout
+;;            python-shell-completion-native-try-output-timeout))
+;;       (python-shell-completion-native-get-completions
+;;        (get-buffer-process (current-buffer))
+;;        nil "_"))))
+
 
 
 (require 'auto-virtualenv)
 (add-hook 'python-mode-hook 'auto-virtualenv-set-virtualenv)
 
 
-(require 'virtualenvwrapper)
-(venv-initialize-interactive-shells) ;; if you want interactive shell support
-(venv-initialize-eshell) ;; if you want eshell support
-(setq venv-location "/home/hatterer/.virtualenvs/")
-
+(use-package virtualenvwrapper
+  :ensure t
+  :config
+  (venv-initialize-interactive-shells) ;; if you want interactive shell support
+  (venv-initialize-eshell) ;; if you want eshell support
+  (setq venv-location "/home/hatterer/.virtualenvs/")
+  )
 
 
 ;;; COMPLETION (better than built-in)
@@ -282,6 +425,8 @@
 ;;  better search
 (global-set-key (kbd "C-M-s") #'flx-isearch-forward)
 (global-set-key (kbd "C-M-r") #'flx-isearch-backward)
+
+
 
 ;;; MULTIPLE CURSORS
 (require 'multiple-cursors)
@@ -300,17 +445,33 @@
 ;; - Sometimes you end up with cursors outside of your view. You can
 ;;   scroll the screen to center on each cursor with `C-v` and `M-v`.
 
+
+;;; yafolding - Folding code blocks based on indentation.
+(require 'yafolding)
+(define-key yafolding-mode-map (kbd "<C-S-return>") nil)
+(define-key yafolding-mode-map (kbd "<C-M-return>") nil)
+(define-key yafolding-mode-map (kbd "<C-return>") nil)
+(define-key yafolding-mode-map (kbd "C-c <C-M-return>") 'yafolding-toggle-all)
+(define-key yafolding-mode-map (kbd "C-c <C-S-return>") 'yafolding-hide-parent-element)
+(define-key yafolding-mode-map (kbd "C-c <C-return>") 'yafolding-toggle-element)
+(add-hook 'prog-mode-hook
+          (lambda () (yafolding-mode)))
+
+
 ;;; WEB-MODE
-(require 'web-mode)
-(add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.css?\\'" . web-mode))
+(use-package web-mode
+  :ensure t
+  :config
+  (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.css?\\'" . web-mode))
+  )
 
 ;;; EMMET-MODE
 (defvar emmet-mode-keymap
@@ -348,6 +509,156 @@
 (add-hook 'oef-mode-hook 'wrap-region-mode)
 
 
+
+;; arduino-mode
+;; You can compile and upload the sketches with "M-x compile" suivi de  "make upload". 
+(require 'cl)
+(autoload 'arduino-mode "arduino-mode" "Arduino editing mode." t)
+(add-to-list 'auto-mode-alist '("\.ino$" . arduino-mode))
+
+
+
+;;; Change bracket pairs from one type to another.
+(defun xah-change-bracket-pairs ( @from-chars @to-chars)
+  "Change bracket pairs from one type to another.
+
+For example, change all parenthesis () to square brackets [].
+Works on selected text, or current text block.
+URL `http://ergoemacs.org/emacs/elisp_change_brackets.html'
+Version 2018-03-31"
+  (interactive
+   (let (($bracketsList
+          '("(paren)"
+            "{brace}"
+            "[square]"
+            "<greater>"
+            "`emacs'"
+            "`markdown`"
+            "~tilde~"
+            "=equal="
+            "\"ascii quote\""
+            "[[double square,2]]"
+            "“curly quote”"
+            "‘single quote’"
+            "‹angle quote›"
+            "«double angle quote»"
+            "「corner」"
+            "『white corner』"
+            "【LENTICULAR】"
+            "〖white LENTICULAR〗"
+            "〈angle bracket〉"
+            "《double angle bracket》"
+            "〔TORTOISE〕"
+            "⦅white paren⦆"
+            "〚white square〛"
+            "⦃white curly bracket⦄"
+            "〈angle bracket〉"
+            "⦑ANGLE BRACKET WITH DOT⦒"
+            "⧼CURVED ANGLE BRACKET⧽"
+            "⟦math square⟧"
+            "⟨math angle⟩"
+            "⟪math DOUBLE ANGLE BRACKET⟫"
+            "⟮math FLATTENED PARENTHESIS⟯"
+            "⟬math WHITE TORTOISE SHELL BRACKET⟭"
+            "❛HEAVY SINGLE QUOTATION MARK ORNAMENT❜"
+            "❝HEAVY DOUBLE TURNED COMMA QUOTATION MARK ORNAMENT❞"
+            "❨MEDIUM LEFT PARENTHESIS ORNAMENT❩"
+            "❪MEDIUM FLATTENED LEFT PARENTHESIS ORNAMENT❫"
+            "❴MEDIUM LEFT CURLY BRACKET ORNAMENT❵"
+            "❬MEDIUM LEFT-POINTING ANGLE BRACKET ORNAMENT❭"
+            "❮HEAVY LEFT-POINTING ANGLE QUOTATION MARK ORNAMENT❯"
+            "❰HEAVY LEFT-POINTING ANGLE BRACKET ORNAMENT❱"
+            "none"
+            )))
+     (list
+      (ido-completing-read "Replace this:" $bracketsList )
+      (ido-completing-read "To:" $bracketsList ))))
+  (let ( $p1 $p2 )
+    (if (use-region-p)
+        (progn
+          (setq $p1 (region-beginning))
+          (setq $p2 (region-end)))
+      (save-excursion
+        (if (re-search-backward "\n[ \t]*\n" nil "move")
+            (progn (re-search-forward "\n[ \t]*\n")
+                   (setq $p1 (point)))
+          (setq $p1 (point)))
+        (if (re-search-forward "\n[ \t]*\n" nil "move")
+            (progn (re-search-backward "\n[ \t]*\n")
+                   (setq $p2 (point)))
+          (setq $p2 (point)))))
+    (save-excursion
+      (save-restriction
+        (narrow-to-region $p1 $p2)
+        (let ( (case-fold-search nil)
+               $fromLeft
+               $fromRight
+               $toLeft
+               $toRight)
+          (cond
+           ((string-match ",2" @from-chars  )
+            (progn
+              (setq $fromLeft (substring @from-chars 0 2))
+              (setq $fromRight (substring @from-chars -2))))
+           (t
+            (progn
+              (setq $fromLeft (substring @from-chars 0 1))
+              (setq $fromRight (substring @from-chars -1)))))
+          (cond
+           ((string-match ",2" @to-chars)
+            (progn
+              (setq $toLeft (substring @to-chars 0 2))
+              (setq $toRight (substring @to-chars -2))))
+           ((string-match "none" @to-chars)
+            (progn
+              (setq $toLeft "")
+              (setq $toRight "")))
+           (t
+            (progn
+              (setq $toLeft (substring @to-chars 0 1))
+              (setq $toRight (substring @to-chars -1)))))
+          (cond
+           ((string-match "markdown" @from-chars)
+            (progn
+              (goto-char (point-min))
+              (while
+                  (re-search-forward "`\\([^`]+?\\)`" nil t)
+                (overlay-put (make-overlay (match-beginning 0) (match-end 0)) 'face 'highlight)
+                (replace-match (concat $toLeft "\\1" $toRight ) "FIXEDCASE" ))))
+           ((string-match "tilde" @from-chars)
+            (progn
+              (goto-char (point-min))
+              (while
+                  (re-search-forward "~\\([^~]+?\\)~" nil t)
+                (overlay-put (make-overlay (match-beginning 0) (match-end 0)) 'face 'highlight)
+                (replace-match (concat $toLeft "\\1" $toRight ) "FIXEDCASE" ))))
+           ((string-match "ascii quote" @from-chars)
+            (progn
+              (goto-char (point-min))
+              (while
+                  (re-search-forward "\"\\([^\"]+?\\)\"" nil t)
+                (overlay-put (make-overlay (match-beginning 0) (match-end 0)) 'face 'highlight)
+                (replace-match (concat $toLeft "\\1" $toRight ) "FIXEDCASE" ))))
+           ((string-match "equal" @from-chars)
+            (progn
+              (goto-char (point-min))
+              (while
+                  (re-search-forward "=\\([^=]+?\\)=" nil t)
+                (overlay-put (make-overlay (match-beginning 0) (match-end 0)) 'face 'highlight)
+                (replace-match (concat $toLeft "\\1" $toRight ) "FIXEDCASE" ))))
+           (t (progn
+                (progn
+                  (goto-char (point-min))
+                  (while (search-forward $fromLeft nil t)
+                    (overlay-put (make-overlay (match-beginning 0) (match-end 0)) 'face 'highlight)
+                    (replace-match $toLeft "FIXEDCASE" "LITERAL")))
+                (progn
+                  (goto-char (point-min))
+                  (while (search-forward $fromRight nil t)
+                    (overlay-put (make-overlay (match-beginning 0) (match-end 0)) 'face 'highlight)
+                    (replace-match $toRight "FIXEDCASE" "LITERAL")))))))))))
+
+(global-set-key (kbd "C-c (") 'xah-change-bracket-pairs)
 
 
 ;;; LATEX XETEX (synchronization with evince)
@@ -421,3 +732,6 @@
    :session nil "/org/gnome/evince/Window/0"
    "org.gnome.evince.Window" "SyncSource"
    'auctex-evince-inverse-sync))
+
+
+
