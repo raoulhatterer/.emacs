@@ -15,21 +15,22 @@
 
 
 
-(let ((my-path (expand-file-name "/usr/local/bin:/usr/local/texlive/2015/bin/x86_64-darwin")))
-(setenv "PATH" (concat my-path ":" (getenv "PATH")))
-(add-to-list 'exec-path my-path)) 
 
+;;; LATEX XETEX (synchronization with Skim)
+;; Forward/inverse search with C-V and S-cmd click
+;; Tells emacs where to find LaTeX.
+(let ((my-path (expand-file-name "/usr/local/bin:/usr/local/texlive/2015/bin/x86_64-darwin")))
+  (setenv "PATH" (concat my-path ":" (getenv "PATH")))
+  (add-to-list 'exec-path my-path)) 
 ;; AucTeX settings
 (setq TeX-PDF-mode t)
-
 (add-hook 'LaTeX-mode-hook
-(lambda ()
-  (push
-   '("latexmk" "latexmk -pdf %s" TeX-run-TeX nil t
-     :help "Run latexmk on file")
-    TeX-command-list)))
+          (lambda ()
+            (push
+             '("latexmk" "latexmk -pdf %s" TeX-run-TeX nil t
+               :help "Run latexmk on file")
+             TeX-command-list)))
 (add-hook 'TeX-mode-hook '(lambda () (setq TeX-command-default "latexmk")))
-
 (setq TeX-view-program-selection '((output-pdf "PDF Viewer")))
 (setq TeX-view-program-list
       '(("PDF Viewer" "/Applications/Skim.app/Contents/SharedSupport/displayline -b -g %n %o %b")))
@@ -192,8 +193,8 @@
 (use-package evil-numbers
   :ensure t
   :config
-  (global-set-key (kbd "<S-prior>") 'evil-numbers/inc-at-pt)
-  (global-set-key (kbd "<S-next>") 'evil-numbers/dec-at-pt)
+  (global-set-key (kbd "C-c +") 'evil-numbers/inc-at-pt)
+  (global-set-key (kbd "C-c -") 'evil-numbers/dec-at-pt)
   )
 
 ;;; PROJECTILE
@@ -260,10 +261,6 @@
 (use-package popup-kill-ring
   :ensure t
   :bind ("M-y" . popup-kill-ring))
-
-
-
-
 
 ;;; DASHBOARD
 (use-package all-the-icons
@@ -372,43 +369,36 @@
 (add-to-list 'org-latex-packages-alist '("" "minted"))
 (setq org-latex-listings 'minted)
 
-
-
-
 ;; Store a link to the current location
 (global-set-key (kbd "C-c l")     'org-store-link)
-
 
 ;; image size in preview
 (setq org-image-actual-width 300)
 
+;; To enable python, gnuplot,... in org-mode 'src' code blocs
+;; shortcut c-c c-,
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((python . t)
+   (gnuplot .t)
+   (latex.t)
+   (shell . t)
+   (ditaa .t)
+   (plantuml .t)
+   ))
 
+(setq org-latex-create-formula-image-program 'imagemagick)
 
-;; ;; To enable python, gnuplot,... in org-mode 'src' code blocs
-;; ;; shortcut c-c c-,
-;; (org-babel-do-load-languages
-;;  'org-babel-load-languages
-;;  '((python . t)
-;;    (gnuplot .t)
-;;    (latex.t)
-;;    (shell . t)
-;;    (ditaa .t)
-;;    (plantuml .t))
-
-
-
-;; (setq org-latex-create-formula-image-program 'imagemagick)
-
-;; ;; Don’t ask before evaluating code blocks.
-;; (setq org-confirm-babel-evaluate nil)
+;; Don’t ask before evaluating code blocks.
+(setq org-confirm-babel-evaluate nil)
  
 
-;; ;;  Shades the background of regular blocks, and colors source blocks only for Python and Emacs-Lisp languages.
-;; (require 'color)
+;;  Shades the background of regular blocks, and colors source blocks only for Python and Emacs-Lisp languages.
+(require 'color)
 
-;; ;; (set-face-attribute 'org-block nil :background
-;; ;;                     (color-darken-name
-;; ;;                      (face-attribute 'default :background) 4))
+(set-face-attribute 'org-block nil :background
+                    (color-darken-name
+                     (face-attribute 'default :background) 4))
 
 
 ;; '(flyspell-default-dictionary "english")
@@ -416,6 +406,8 @@
 (let ((langs '("english" "francais")))
   (setq lang-ring (make-ring (length langs)))
   (dolist (elem langs) (ring-insert lang-ring elem)))
+;; I used homebrew to install ispell and apsell
+(setq ispell-program-name "/usr/local/bin/aspell")
 (defun cycle-ispell-languages ()
   (interactive)
   (let ((lang (ring-ref lang-ring -1)))
@@ -428,19 +420,14 @@
 (add-hook 'text-mode-hook 'flyspell-mode)
 (add-hook 'prog-mode-hook 'flyspell-prog-mode)
 
-;; ;;; KEYBOARD
-;; ;; to increase / decrease  the buffer text size  `C-x C-+’ and ‘C-x C--’
-;; ;; (‘text-scale-adjust’)  (`C-+’ or ‘C--’ to repeat). To restore the default
-;; ;; (global) face height, type ‘C-x C-0’. ‘S-mouse-1’ pops up a menu where you 
-;; ;; can choose these same actions.
-;; ;; 2 keys for "en dash" (osX like) 
-;; (global-set-key (kbd "M--") (lambda () (interactive) (insert "–")))
-;; ;; french guillemet 
-;; (global-set-key (kbd "C-<") (lambda () (interactive) (insert "« ")))
-;; (global-set-key (kbd "C->") (lambda () (interactive) (insert " »")))
-;; ;; (Ctrl + Alt + espace)  un espace insécable : 0xA0 
-;; (global-set-key (kbd "C-M-SPC") (lambda () (interactive) (insert " ")))
-;; magit-status
+;;; KEYBOARD
+;; to increase / decrease  the buffer text size  `C-x C-+’ and ‘C-x C--’
+;; (‘text-scale-adjust’)  (`C-+’ or ‘C--’ to repeat). To restore the default
+;; (global) face height, type ‘C-x C-0’. ‘S-mouse-1’ pops up a menu where you 
+;; can choose these same actions.
+;; (Ctrl + Alt + espace)  un espace insécable : 0xA0 
+(global-set-key (kbd "C-M-SPC") (lambda () (interactive) (insert " ")))
+;; MAGIT-STATUS
 (global-set-key (kbd "C-c m") 'magit-status)
 ;; Expand Region
 (require 'expand-region)
@@ -737,77 +724,5 @@ Version 2018-03-31"
 
 (global-set-key (kbd "C-c (") 'xah-change-bracket-pairs)
 
-
-;; ;;; LATEX XETEX (synchronization with evince)
-;; ;; Forward/inverse search with evince using D-bus.
-;; ;;
-;; (server-start)
-;; (add-hook 'LaTeX-mode-hook 'TeX-PDF-mode)
-;; (add-hook 'LaTeX-mode-hook 'TeX-source-correlate-mode)
-;; (setq TeX-source-correlate-method 'synctex)
-;; ;;
-;; (if (require 'dbus "dbus" t)
-;;     (progn
-;;       ;; universal time, need by evince
-;;       (defun utime ()
-;;     	(let ((high (nth 0 (current-time)))
-;;     	      (low (nth 1 (current-time))))
-;;     	  (+ (* high (lsh 1 16) ) low)))
-;;       ;;
-;;       ;; Forward search.
-;;       ;; Adapted from http://dud.inf.tu-dresden.de/~ben/evince_synctex.tar.gz
-;;       (defun auctex-evince-forward-sync (pdffile texfile line)
-;;     	(let ((dbus-name
-;; 	       "org.gnome.evince.Daemon"  ; service
-;; 	       "/org/gnome/evince/Daemon" ; path
-;; 	       "org.gnome.evince.Daemon"  ; interface
-;; 	       "FindDocument"
-;; 	       (concat "file://" pdffile)
-;; 	       t     ; Open a new window if the file is not opened.
-;; 	       )))
-;; 	(dbus-call-method :session
-;; 			  dbus-name
-;; 			  "/org/gnome/evince/Window/0"
-;; 			  "org.gnome.evince.Window"
-;; 			  "SyncView"
-;; 			  texfile
-;; 			  (list :struct :int32 line :int32 1)
-;; 			  (utime))))
-;;   ;;
-;;   (defun auctex-evince-view ()
-;;     (let ((pdf (file-truename (concat default-directory
-;; 				      (TeX-master-file (TeX-output-extension)))))
-;; 	  (tex (buffer-file-name))
-;; 	  (line (line-number-at-pos)))
-;;       (auctex-evince-forward-sync pdf tex line)))
-
-;;   ;; New view entry: Evince via D-bus.
-;;   (setq TeX-view-program-list '())
-;;   (add-to-list 'TeX-view-program-list
-;; 	       '("EvinceDbus" auctex-evince-view))
-
-;;   ;; Prepend Evince via D-bus to program selection list
-;;   ;; overriding other settings for PDF viewing.
-;;   (setq TeX-view-program-selection '())
-;;   (add-to-list 'TeX-view-program-selection
-;; 	       '(output-pdf "EvinceDbus"))
-
-;;   ;; Inverse search.
-;;   ;; Adapted from: http://www.mail-archive.com/auctex@gnu.org/msg04175.html
-;;   (defun auctex-evince-inverse-sync (file linecol timestamp)
-;;     (let ((buf (get-file-buffer (substring file 7)))
-;; 	  (line (car linecol))
-;; 	  (col (cadr linecol)))
-;;       (if (null buf)
-;; 	  (message "Sorry, %s is not opened..." file)
-;; 	(switch-to-buffer buf)
-;; 	(goto-line (car linecol))
-;; 	(unless (= col -1)
-;; 	  (move-to-column col)))))
-
-;;   (dbus-register-signal
-;;    :session nil "/org/gnome/evince/Window/0"
-;;    "org.gnome.evince.Window" "SyncSource"
-;;    'auctex-evince-inverse-sync))
 
 
