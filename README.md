@@ -10,3 +10,4 @@
 
 ## Emacs
 - init.el
+- .latexmkrc
