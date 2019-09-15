@@ -1,20 +1,20 @@
 ;;; Indique où se trouve le fichier init pris en charge par emacs
 ;; C-h v user-init-file
 
-;;; pour mac
 (when (eq system-type 'darwin)
-  ;; mac specific bindings
-  (setq mac-right-command-modifier nil ; cmd de droite = cmd
-	mac-command-modifier nil ; cmd de gauche = cmd
-	mac-option-modifier 'meta ; option de gauche = meta
-	mac-right-option-modifier nil ; option de droite = carac spéciaux
-	mac-control-modifier 'control ; control de gauche = control 
-	ns-function-modifier 'hyper ; fn key = hyper
-	ns-right-alternate-modifier nil); cette touche n'existe pas.
+  ;;;; pas utilisé car tout ce fichier est pour emacs sous osx
   )
 
+;; mac specific bindings
+(setq mac-right-command-modifier nil ; cmd de droite = cmd
+      mac-command-modifier nil ; cmd de gauche = cmd
+      mac-option-modifier 'meta ; option de gauche = meta
+      mac-right-option-modifier nil ; option de droite = carac spéciaux
+      mac-control-modifier 'control ; control de gauche = control 
+      ns-function-modifier 'hyper ; fn key = hyper
+      ns-right-alternate-modifier nil); cette touche n'existe pas.
 
-
+(global-set-key (kbd "C-:") 'indent-region)
 
 ;;; LATEX XETEX (synchronization with Skim)
 ;; Forward/inverse search with C-V and S-cmd click
@@ -67,7 +67,7 @@
  '(org-src-preserve-indentation nil)
  '(package-selected-packages
    (quote
-    (flycheck multiple-cursors auctex-latexmk google-translate popup-kill-ring avy helm switch-window which-key web-mode all-the-icons dashboard realgud-rdb2 evil-numbers flycheck-plantuml pytest realgud yasnippet-classic-snippets django-snippets common-lisp-snippets sr-speedbar django-mode markdown-mode+ markdown-preview-eww markdown-preview-mode pacmacs wrap-region corral company-web company-jedi company-math yafolding auto-virtualenv jquery-doc exec-path-from-shell js-comint quickrun noctilux-theme zone-rainbow xah-find tidy rainbow-mode rainbow-identifiers rainbow-delimiters rainbow-blocks python projectile-git-autofetch projectile-codesearch org multi-web-mode magic-latex-buffer keychain-environment jedi hydandata-light-theme hlinum git-auto-commit-mode flx-isearch flx-ido find-file-in-repository embrace elpy egg diredful dired-rainbow dired-k dired+ clues-theme basic-theme aurora-theme ample-zen-theme alect-themes ac-html ac-emmet)))
+    (magit flycheck multiple-cursors auctex-latexmk google-translate popup-kill-ring avy helm switch-window which-key web-mode all-the-icons dashboard realgud-rdb2 evil-numbers flycheck-plantuml pytest realgud yasnippet-classic-snippets django-snippets common-lisp-snippets sr-speedbar django-mode markdown-mode+ markdown-preview-eww markdown-preview-mode pacmacs wrap-region corral company-web company-jedi company-math yafolding auto-virtualenv jquery-doc exec-path-from-shell js-comint quickrun noctilux-theme zone-rainbow xah-find tidy rainbow-mode rainbow-identifiers rainbow-delimiters rainbow-blocks python projectile-git-autofetch projectile-codesearch org multi-web-mode magic-latex-buffer keychain-environment jedi hydandata-light-theme hlinum git-auto-commit-mode flx-isearch flx-ido find-file-in-repository embrace elpy egg diredful dired-rainbow dired-k dired+ clues-theme basic-theme aurora-theme ample-zen-theme alect-themes ac-html ac-emmet)))
  '(plantuml-jar-path "~/.emacs.d/plantuml.jar")
  '(python-shell-interpreter "python3")
  '(save-place t)
@@ -420,6 +420,17 @@
 (add-hook 'text-mode-hook 'flyspell-mode)
 (add-hook 'prog-mode-hook 'flyspell-prog-mode)
 
+
+
+;;; MAGIT
+(use-package magit
+  :ensure t
+  :config
+  ;; MAGIT-STATUS
+  (global-set-key (kbd "C-c m") 'magit-status)
+  )
+
+
 ;;; KEYBOARD
 ;; to increase / decrease  the buffer text size  `C-x C-+’ and ‘C-x C--’
 ;; (‘text-scale-adjust’)  (`C-+’ or ‘C--’ to repeat). To restore the default
@@ -427,8 +438,6 @@
 ;; can choose these same actions.
 ;; (Ctrl + Alt + espace)  un espace insécable : 0xA0 
 (global-set-key (kbd "C-M-SPC") (lambda () (interactive) (insert " ")))
-;; MAGIT-STATUS
-(global-set-key (kbd "C-c m") 'magit-status)
 ;; Expand Region
 (require 'expand-region)
 (global-set-key (kbd "C-=") 'er/expand-region)
@@ -524,16 +533,17 @@
   ;;   scroll the screen to center on each cursor with `C-v` and `M-v`.
   )
 
-;; ;;; yafolding - Folding code blocks based on indentation.
-;; (require 'yafolding)
-;; (define-key yafolding-mode-map (kbd "<C-S-return>") nil)
-;; (define-key yafolding-mode-map (kbd "<C-M-return>") nil)
-;; (define-key yafolding-mode-map (kbd "<C-return>") nil)
-;; (define-key yafolding-mode-map (kbd "C-c <C-M-return>") 'yafolding-toggle-all)
-;; (define-key yafolding-mode-map (kbd "C-c <C-S-return>") 'yafolding-hide-parent-element)
-;; (define-key yafolding-mode-map (kbd "C-c <C-return>") 'yafolding-toggle-element)
-;; (add-hook 'prog-mode-hook
-;;           (lambda () (yafolding-mode)))
+
+;;; YAFOLDING - Folding code blocks based on indentation (used for oef-mode)
+(use-package yafolding
+  :ensure t
+  :config
+  (define-key yafolding-mode-map (kbd "<C-S-return>") nil)
+  (define-key yafolding-mode-map (kbd "<C-M-return>") nil)
+  (define-key yafolding-mode-map (kbd "<C-return>") nil)
+  )
+(add-hook 'oef-mode-hook
+          (lambda () (yafolding-mode)))
 
 
 ;; ;;; WEB-MODE
@@ -551,25 +561,23 @@
 ;;   (add-to-list 'auto-mode-alist '("\\.css?\\'" . web-mode))
 ;;   )
 
-;; ;;; EMMET-MODE
-;; (defvar emmet-mode-keymap
-;;   (let
-;;       ((map (make-sparse-keymap)))
-;;     (define-key map (kbd "C-j") 'emmet-expand-line)
-;;     (define-key map (kbd "<C-return>") 'emmet-expand-line)
-;;     (define-key map (kbd "<C-M-right>") 'emmet-next-edit-point)
-;;     (define-key map (kbd "<C-M-left>") 'emmet-prev-edit-point)
-;;     (define-key map (kbd "C-c w") 'emmet-wrap-with-markup)
-;;     map)
-;;   "Keymap for emmet minor mode.")
+;;; EMMET-MODE
+(defvar emmet-mode-keymap
+  (let
+      ((map (make-sparse-keymap)))
+    (define-key map (kbd "C-j") 'emmet-expand-line)
+;;  (define-key map (kbd "<C-return>") 'emmet-expand-line)
+    (define-key map (kbd "<C-M-right>") 'emmet-next-edit-point)
+    (define-key map (kbd "<C-M-left>") 'emmet-prev-edit-point)
+    (define-key map (kbd "C-c w") 'emmet-wrap-with-markup)
+    map)
+  "Keymap for emmet minor mode.")
 
-
-
-;; (require 'emmet-mode)
-;; (add-hook 'sgml-mode-hook 'emmet-mode) ;; Auto-start on any markup modes
-;; (add-hook 'html-mode-hook 'emmet-mode)
-;; (add-hook 'css-mode-hook  'emmet-mode)
-;; (add-hook 'web-mode-hook  'emmet-mode)
+(require 'emmet-mode)
+(add-hook 'sgml-mode-hook 'emmet-mode) ;; Auto-start on any markup modes
+(add-hook 'html-mode-hook 'emmet-mode)
+(add-hook 'css-mode-hook  'emmet-mode)
+(add-hook 'web-mode-hook  'emmet-mode)
 
 
 
