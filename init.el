@@ -47,6 +47,7 @@
  '(blink-cursor-delay 1)
  '(blink-cursor-interval 0.1)
  '(debug-on-error t)
+ '(dired-dwim-target t)
  '(elpy-modules
    (quote
     (elpy-module-company elpy-module-eldoc elpy-module-pyvenv elpy-module-highlight-indentation elpy-module-yasnippet elpy-module-django elpy-module-sane-defaults)))
