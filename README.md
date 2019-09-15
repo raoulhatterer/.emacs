@@ -1,7 +1,10 @@
 # on linux
+----------
+
 - .emacs
 
 # on mac osx
+ -----------
 
 ## Aquamacs
 
