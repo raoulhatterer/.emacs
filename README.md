@@ -5,7 +5,7 @@
 # Mac OSX
 
 - Aquamacs
-À placer dans ~/Library/Preferences/Aquamacs Emacs/`
+À placer dans `~/Library/Preferences/Aquamacs Emacs/`
     - Preference.el
     - customizations.el
 
