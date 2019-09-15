@@ -1,16 +1,14 @@
 # on linux
-----------
 
 - .emacs
 
 # on mac osx
------------
 
-## Aquamacs
+- Aquamacs
 
-- Preference.el
-- customizations.el
+    - Preference.el
+    - customizations.el
 
-## Emacs
-- init.el
-- .latexmkrc
+- Emacs
+    - init.el
+    - .latexmkrc
