@@ -4,7 +4,7 @@
 - .emacs
 
 # on mac osx
- -----------
+-----------
 
 ## Aquamacs
 
