@@ -10,6 +10,6 @@
     - customizations.el
 
 - Emacs
-À placer dans '~/.emacs.d'
+À placer dans `~/.emacs.d
     - init.el
     - .latexmkrc
