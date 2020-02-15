@@ -88,8 +88,8 @@
   (require 'package)
   (add-to-list 'package-archives
 	       '("melpa" . "http://melpa.org/packages/"))
-  (package-refresh-contents)
   (package-initialize)
+  (package-refresh-contents)
   (package-install 'el-get)
   (require 'el-get))
 
@@ -111,8 +111,8 @@
 
 
 ;; for development
-(add-to-list 'load-path "~/Library/Preferences/Aquamacs Emacs/Packages/lisp/oef-mode/")
-(load "oef-mode") ;; load the packaged named oef (best not to include the ending “.el” or “.elc”)
+;; (add-to-list 'load-path "~/Library/Preferences/Aquamacs Emacs/Packages/lisp/oef-mode/")
+;; (load "oef-mode") ;; load the packaged named oef (best not to include the ending “.el” or “.elc”)
 
 
 
@@ -162,8 +162,11 @@
 
 
 
-(require 'company)
-(add-hook 'after-init-hook 'global-company-mode)
+(use-package company
+  :ensure t
+  :config
+  (add-hook 'after-init-hook 'global-company-mode)
+  )
 ;; global activation of the unicode symbol completion 
 
 
@@ -439,9 +442,14 @@
 ;; can choose these same actions.
 ;; (Ctrl + Alt + espace)  un espace insécable : 0xA0 
 (global-set-key (kbd "C-M-SPC") (lambda () (interactive) (insert " ")))
+
 ;; Expand Region
-(require 'expand-region)
-(global-set-key (kbd "C-=") 'er/expand-region)
+(use-package expand-region
+  :ensure t
+  :config
+  (global-set-key (kbd "C-=") 'er/expand-region)  
+  )
+
 
 ;; ;;; CORRECTION ORTHOGRAPHIQUE
 ;; ;; This is bound to 'C-;' and 'échap TAB'
@@ -574,22 +582,32 @@
     map)
   "Keymap for emmet minor mode.")
 
-(require 'emmet-mode)
-(add-hook 'sgml-mode-hook 'emmet-mode) ;; Auto-start on any markup modes
-(add-hook 'html-mode-hook 'emmet-mode)
-(add-hook 'css-mode-hook  'emmet-mode)
-(add-hook 'web-mode-hook  'emmet-mode)
+(use-package emmet-mode
+  :ensure t
+  :config
+  (add-hook 'sgml-mode-hook 'emmet-mode) ;; Auto-start on any markup modes
+  (add-hook 'html-mode-hook 'emmet-mode)
+  (add-hook 'css-mode-hook  'emmet-mode)
+  (add-hook 'web-mode-hook  'emmet-mode)
+  )
 
 
 
 ;;; RAINBOW-DELIMITERS
-(require 'rainbow-delimiters)
-(add-hook 'oef-mode-hook 'rainbow-delimiters-mode)
+(use-package rainbow-delimiters
+  :ensure t
+  :config
+  (add-hook 'oef-mode-hook 'rainbow-delimiters-mode)
+  )
+
 
 ;;; RAINBOW-MODE
-(require 'rainbow-mode)
-(add-to-list 'rainbow-html-colors-major-mode-list 'oef-mode) ; 
-(add-hook 'oef-mode-hook 'rainbow-mode) ; Auto-start CSS colorization
+(use-package rainbow-mode
+  :ensure t
+  :config
+  (add-to-list 'rainbow-html-colors-major-mode-list 'oef-mode) ; 
+  (add-hook 'oef-mode-hook 'rainbow-mode) ; Auto-start CSS colorization
+)
 
 ;;; Change bracket pairs from one type to another.
 (defun xah-change-bracket-pairs ( @from-chars @to-chars)
@@ -625,7 +643,7 @@ Version 2018-03-31"
             "⦅white paren⦆"
             "〚white square〛"
             "⦃white curly bracket⦄"
-            "〈angle bracket〉"
+            "〈angle bracket〉"
             "⦑ANGLE BRACKET WITH DOT⦒"
             "⧼CURVED ANGLE BRACKET⧽"
             "⟦math square⟧"
@@ -732,6 +750,5 @@ Version 2018-03-31"
                     (replace-match $toRight "FIXEDCASE" "LITERAL")))))))))))
 
 (global-set-key (kbd "C-c (") 'xah-change-bracket-pairs)
-
 
 
