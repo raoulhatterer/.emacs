@@ -24,9 +24,16 @@
 
 **** Running Emacs.app from the command line
 
-     Call this script "emacs" and put it somewhere in your PATH (~/bin or /usr/local/bin):
+     Call this script "emacs" and put it somewhere in  `/usr/local/bin`:
 
      #+BEGIN_SRC shell
      #!/bin/sh
      /Applications/Emacs.app/Contents/MacOS/Emacs "$@"
+     #+END_SRC
+
+     Pour rendre ce script executable:
+
+     #+BEGIN_SRC shell
+cd /usr/local/bin   
+sudo chmod +x emacs 
      #+END_SRC
