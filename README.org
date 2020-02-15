@@ -31,7 +31,7 @@
      /Applications/Emacs.app/Contents/MacOS/Emacs "$@"
      #+END_SRC
 
-     Pour rendre ce script executable:
+     Be sure to give it the execution permission.
 
      #+BEGIN_SRC shell
 cd /usr/local/bin   
