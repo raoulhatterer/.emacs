@@ -1,19 +1,21 @@
-# Linux
+* Linux
 
 - .emacs
 
-# Mac OSX
+* Mac OSX
 
-- Aquamacs
+** Aquamacs
 
 À placer dans `~/Library/Preferences/Aquamacs Emacs/`
 
     - Preference.el
     - customizations.el
 
-- Emacs
+** Emacs
 
 À placer dans `~/.emacs.d`
 
     - init.el
     - .latexmkrc
+** Truc et astuces
+
