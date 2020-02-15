@@ -6,7 +6,7 @@
 
 ** Aquamacs init file
 
-   À placer dans `~/Library/Preferences/Aquamacs Emacs/`
+   Put it in  `~/Library/Preferences/Aquamacs Emacs/`
 
    - Preference.el
    - customizations.el
@@ -15,7 +15,7 @@
 
 *** init file
 
-    À placer dans `~/.emacs.d`
+    Put it in `~/.emacs.d`
 
     - init.el
     - .latexmkrc
