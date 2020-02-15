@@ -1,21 +1,32 @@
-* Linux
+* Linux init file
 
-- .emacs
+  - .emacs
 
 * Mac OSX
 
-** Aquamacs
+** Aquamacs init file
 
-À placer dans `~/Library/Preferences/Aquamacs Emacs/`
+   À placer dans `~/Library/Preferences/Aquamacs Emacs/`
 
-    - Preference.el
-    - customizations.el
+   - Preference.el
+   - customizations.el
 
 ** Emacs
 
-À placer dans `~/.emacs.d`
+*** init file
+
+    À placer dans `~/.emacs.d`
 
     - init.el
     - .latexmkrc
-** Truc et astuces
 
+*** Truc et astuces
+
+**** Running Emacs.app from the command line
+
+     Call this script "emacs" and put it somewhere in your PATH (~/bin or /usr/local/bin):
+
+     #+BEGIN_SRC shell
+     #!/bin/sh
+     /Applications/Emacs.app/Contents/MacOS/Emacs "$@"
+     #+END_SRC
