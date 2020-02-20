@@ -14,26 +14,35 @@
       ns-function-modifier 'hyper ; fn key = hyper
       ns-right-alternate-modifier nil); cette touche n'existe pas.
 
+;; démarrage 
+(add-to-list 'default-frame-alist '(fullscreen . fullheight))
+
+;; exec-path
+(add-to-list 'exec-path "/usr/local/bin")
+
+;; INDENT-REGION on OSX 
 (global-set-key (kbd "C-:") 'indent-region)
 
 ;;; LATEX XETEX (synchronization with Skim)
 ;; Forward/inverse search with C-V and S-cmd click
 ;; Tells emacs where to find LaTeX.
-(let ((my-path (expand-file-name "/usr/local/bin:/usr/local/texlive/2015/bin/x86_64-darwin")))
+(let ((my-path (expand-file-name "/usr/local/bin:/usr/local/texlive/2019/bin/x86_64-darwin")))
   (setenv "PATH" (concat my-path ":" (getenv "PATH")))
   (add-to-list 'exec-path my-path)) 
 ;; AucTeX settings
 (setq TeX-PDF-mode t)
+(setq TeX-engine 'xetex)
 (add-hook 'LaTeX-mode-hook
-          (lambda ()
-            (push
-             '("latexmk" "latexmk -pdf %s" TeX-run-TeX nil t
-               :help "Run latexmk on file")
-             TeX-command-list)))
-(add-hook 'TeX-mode-hook '(lambda () (setq TeX-command-default "latexmk")))
+	  (lambda ()
+	    (push
+	     '("latexmk" "latexmk -pdf %s" TeX-run-TeX nil t
+	       :help "Run latexmk on file")
+	     TeX-command-list)))
+(add-hook 'TeX-mode-hook '(lambda () (setq TeX-command-default "LaTeX")))
 (setq TeX-view-program-selection '((output-pdf "PDF Viewer")))
 (setq TeX-view-program-list
       '(("PDF Viewer" "/Applications/Skim.app/Contents/SharedSupport/displayline -b -g %n %o %b")))
+  
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -52,6 +61,7 @@
    (quote
     (elpy-module-company elpy-module-eldoc elpy-module-pyvenv elpy-module-highlight-indentation elpy-module-yasnippet elpy-module-django elpy-module-sane-defaults)))
  '(elpy-rpc-python-command "python3")
+ '(elpy-rpc-virtualenv-path "~/.virtualenvs/python3.8")
  '(global-company-mode t)
  '(indent-tabs-mode nil)
  '(initial-scratch-message
@@ -68,7 +78,7 @@
  '(org-src-preserve-indentation nil)
  '(package-selected-packages
    (quote
-    (magit flycheck multiple-cursors auctex-latexmk google-translate popup-kill-ring avy helm switch-window which-key web-mode all-the-icons dashboard realgud-rdb2 evil-numbers flycheck-plantuml pytest realgud yasnippet-classic-snippets django-snippets common-lisp-snippets sr-speedbar django-mode markdown-mode+ markdown-preview-eww markdown-preview-mode pacmacs wrap-region corral company-web company-jedi company-math yafolding auto-virtualenv jquery-doc exec-path-from-shell js-comint quickrun noctilux-theme zone-rainbow xah-find tidy rainbow-mode rainbow-identifiers rainbow-delimiters rainbow-blocks python projectile-git-autofetch projectile-codesearch org multi-web-mode magic-latex-buffer keychain-environment jedi hydandata-light-theme hlinum git-auto-commit-mode flx-isearch flx-ido find-file-in-repository embrace elpy egg diredful dired-rainbow dired-k dired+ clues-theme basic-theme aurora-theme ample-zen-theme alect-themes ac-html ac-emmet)))
+    (sqlup-mode htmlize virtualenvwrapper magit flycheck multiple-cursors auctex-latexmk google-translate popup-kill-ring avy helm switch-window which-key web-mode all-the-icons dashboard realgud-rdb2 evil-numbers flycheck-plantuml pytest realgud yasnippet-classic-snippets django-snippets common-lisp-snippets sr-speedbar django-mode markdown-mode+ markdown-preview-eww markdown-preview-mode pacmacs wrap-region corral company-web company-jedi company-math yafolding auto-virtualenv jquery-doc exec-path-from-shell js-comint quickrun noctilux-theme zone-rainbow xah-find tidy rainbow-mode rainbow-identifiers rainbow-delimiters rainbow-blocks python projectile-git-autofetch projectile-codesearch org multi-web-mode magic-latex-buffer keychain-environment jedi hydandata-light-theme hlinum git-auto-commit-mode flx-isearch flx-ido find-file-in-repository embrace elpy egg diredful dired-rainbow dired-k dired+ clues-theme basic-theme aurora-theme ample-zen-theme alect-themes ac-html ac-emmet)))
  '(plantuml-jar-path "~/.emacs.d/plantuml.jar")
  '(python-shell-interpreter "python3")
  '(save-place t)
@@ -159,8 +169,24 @@
 	     (add-hook 'oef-mode-hook 'wrap-region-mode)
 	     )
 
+(use-package sql
+  :ensure t
+  :config
+  (sql-set-product-feature 'mysql :prompt-regexp 
+                           "^\\(MariaDB\\|MySQL\\) \\[[_a-zA-Z]*\\]> ")
+  (setq sql-user "user_gestionnaire")
+  (setq sql-database "bd_gestion_des_notes")
+  (setq sql-server "localhost")
+  )
 
-
+;; SQLUP-MODE
+(use-package sqlup-mode
+  :ensure t
+  :config
+  (add-hook 'sql-mode-hook 'sqlup-mode)
+  (add-hook 'sql-interactive-mode-hook 'sqlup-mode)
+  (add-hook 'redis-mode-hook 'sqlup-mode)
+  )
 
 (use-package company
   :ensure t
@@ -266,43 +292,23 @@
   :ensure t
   :bind ("M-y" . popup-kill-ring))
 
+
 ;;; DASHBOARD
-(use-package all-the-icons
-  :ensure t)
-
-
 (use-package dashboard
   :ensure t
+  :ensure page-break-lines  
+  :ensure projectile
   :config
   (dashboard-setup-startup-hook)
   (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
-                                        ; To add icons to the widget headings and their items:
-  (setq dashboard-set-heading-icons t)
-  (setq dashboard-set-file-icons t)
-  (dashboard-modify-heading-icons '((recents . "file-text")
-                                    (bookmarks . "book")))
- ; To show navigator below the banner:
-  (setq dashboard-set-navigator t)
-  ;; Format: "(icon title help action face prefix suffix)"
-  (setq dashboard-navigator-buttons
-        `(;; line1
-          ((,(all-the-icons-octicon "mark-github" :height 1.1 :v-adjust 0.0)
-            "Homepage"
-            "Browse homepage"
-            (lambda (&rest _) (browse-url "homepage")))
-           ("★" "Star" "Show stars" (lambda (&rest _) (show-stars)) warning)
-           ("?" "" "?/h" #'show-help nil "<" ">"))
-          ;; line 2
-          ((,(all-the-icons-faicon "linkedin" :height 1.1 :v-adjust 0.0)
-            "Linkedin"
-            ""
-            (lambda (&rest _) (browse-url "homepage")))
-           ("⚑" nil "Show flags" (lambda (&rest _) (message "flag")) error))))
+  ;; This will add the recent files, bookmarks, projects, org-agenda and registers widgets to your dashboard each displaying 5 items.
   (setq dashboard-items '((recents  . 5)
                           (bookmarks . 5)
                           (projects . 5)
                           (agenda . 5)
                           (registers . 5)))
+  (setq dashboard-set-footer nil)
+
   )
 
 
@@ -314,7 +320,19 @@
   )
 
 
+;; AUCTEX
+(use-package tex-site
+  :ensure auctex)
+
+
+
 ;; ORG-MODE
+(use-package org
+  :ensure t
+  :init
+  (add-hook 'org-mode-hook #'visual-line-mode)
+  )
+
 ;; I like to see an outline of pretty bullets instead of a list of asterisks.
 (use-package org-bullets
   :ensure t
@@ -332,9 +350,12 @@
 ;; When editing a code snippet, use the current window rather than popping open a new one (which shows the same information).
 (setq org-src-window-setup 'current-window)
 
-;; Allow export to markdown and beamer (for presentations).
-(use-package org
+
+;; Allow export to html
+(use-package htmlize
   :ensure t)
+
+;; Allow export to markdown and beamer (for presentations).
 (require 'ox-md)
 (require 'ox-latex)
 (require 'ox-beamer)
@@ -384,6 +405,8 @@
 (org-babel-do-load-languages
  'org-babel-load-languages
  '((python . t)
+   (emacs-lisp . t)
+   (org . t)
    (gnuplot .t)
    (latex.t)
    (shell . t)
@@ -406,8 +429,9 @@
 
 
 ;; '(flyspell-default-dictionary "english")
+'(flyspell-default-dictionary "francais")
 ;; Change Flyspell dictionary with F6 
-(let ((langs '("english" "francais")))
+(let ((langs '("francais" "english")))
   (setq lang-ring (make-ring (length langs)))
   (dolist (elem langs) (ring-insert lang-ring elem)))
 ;; I used homebrew to install ispell and apsell
@@ -418,12 +442,15 @@
     (ring-insert lang-ring lang)
     (ispell-change-dictionary lang)))
 (global-set-key [f6] 'cycle-ispell-languages)
-
-;; (dolist (hook '(text-mode-hook oef-mode-hook))
-;;   (add-hook hook (lambda () (flyspell-mode 1))))
 (add-hook 'text-mode-hook 'flyspell-mode)
 (add-hook 'prog-mode-hook 'flyspell-prog-mode)
-
+;; (dolist (hook '(text-mode-hook oef-mode-hook))
+;;   (add-hook hook (lambda () (flyspell-mode 1))))
+;; for track-pad
+(eval-after-load "flyspell"
+    '(progn
+       (define-key flyspell-mouse-map [down-mouse-3] #'flyspell-correct-word)
+       (define-key flyspell-mouse-map [mouse-3] #'undefined)))
 
 
 ;;; MAGIT
@@ -476,8 +503,14 @@
 
 
 
-;; ;;; PYTHON
-;; (elpy-enable)
+;;; PYTHON
+(use-package elpy
+  :ensure t
+  :init
+  (elpy-enable))
+
+
+
 ;; (define-key yas-minor-mode-map (kbd "C-c k") 'yas-expand)
 
 ;; ;; (with-eval-after-load 'python
@@ -490,19 +523,19 @@
 ;; ;;        (get-buffer-process (current-buffer))
 ;; ;;        nil "_"))))
 
+(use-package auto-virtualenv
+  :ensure t
+  :config
+  (add-hook 'python-mode-hook 'auto-virtualenv-set-virtualenv)
+  )
 
-
-;; (require 'auto-virtualenv)
-;; (add-hook 'python-mode-hook 'auto-virtualenv-set-virtualenv)
-
-
-;; (use-package virtualenvwrapper
-;;   :ensure t
-;;   :config
-;;   (venv-initialize-interactive-shells) ;; if you want interactive shell support
-;;   (venv-initialize-eshell) ;; if you want eshell support
-;;   (setq venv-location "/home/hatterer/.virtualenvs/")
-;;   )
+(use-package virtualenvwrapper
+  :ensure t
+  :config
+  (venv-initialize-interactive-shells) ;; if you want interactive shell support
+  (venv-initialize-eshell) ;; if you want eshell support
+  (setq venv-location "~/.virtualenvs/")
+  )
 
 
 ;;; COMPLETION (better than built-in)
@@ -519,8 +552,6 @@
   (global-set-key (kbd "C-M-s") #'flx-isearch-forward)
   (global-set-key (kbd "C-M-r") #'flx-isearch-backward)
   )
-
-
 
 ;;; MULTIPLE CURSORS
 (use-package multiple-cursors
@@ -609,6 +640,7 @@
   (add-hook 'oef-mode-hook 'rainbow-mode) ; Auto-start CSS colorization
 )
 
+
 ;;; Change bracket pairs from one type to another.
 (defun xah-change-bracket-pairs ( @from-chars @to-chars)
   "Change bracket pairs from one type to another.
@@ -643,7 +675,7 @@ Version 2018-03-31"
             "⦅white paren⦆"
             "〚white square〛"
             "⦃white curly bracket⦄"
-            "〈angle bracket〉"
+            "〈angle bracket〉"
             "⦑ANGLE BRACKET WITH DOT⦒"
             "⧼CURVED ANGLE BRACKET⧽"
             "⟦math square⟧"
