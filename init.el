@@ -17,6 +17,9 @@
 ;; démarrage 
 (add-to-list 'default-frame-alist '(fullscreen . fullheight))
 
+;; load-path
+(add-to-list 'load-path "~/.emacs.d/lisp/")
+
 ;; exec-path
 (add-to-list 'exec-path "/usr/local/bin")
 
@@ -78,7 +81,7 @@
  '(org-src-preserve-indentation nil)
  '(package-selected-packages
    (quote
-    (sqlup-mode htmlize virtualenvwrapper magit flycheck multiple-cursors auctex-latexmk google-translate popup-kill-ring avy helm switch-window which-key web-mode all-the-icons dashboard realgud-rdb2 evil-numbers flycheck-plantuml pytest realgud yasnippet-classic-snippets django-snippets common-lisp-snippets sr-speedbar django-mode markdown-mode+ markdown-preview-eww markdown-preview-mode pacmacs wrap-region corral company-web company-jedi company-math yafolding auto-virtualenv jquery-doc exec-path-from-shell js-comint quickrun noctilux-theme zone-rainbow xah-find tidy rainbow-mode rainbow-identifiers rainbow-delimiters rainbow-blocks python projectile-git-autofetch projectile-codesearch org multi-web-mode magic-latex-buffer keychain-environment jedi hydandata-light-theme hlinum git-auto-commit-mode flx-isearch flx-ido find-file-in-repository embrace elpy egg diredful dired-rainbow dired-k dired+ clues-theme basic-theme aurora-theme ample-zen-theme alect-themes ac-html ac-emmet)))
+    (markdown-mode sqlup-mode htmlize virtualenvwrapper magit flycheck multiple-cursors auctex-latexmk google-translate popup-kill-ring avy helm switch-window which-key web-mode all-the-icons dashboard realgud-rdb2 evil-numbers flycheck-plantuml pytest realgud yasnippet-classic-snippets django-snippets common-lisp-snippets sr-speedbar django-mode markdown-preview-eww markdown-preview-mode pacmacs wrap-region corral company-web company-jedi company-math yafolding auto-virtualenv jquery-doc exec-path-from-shell js-comint quickrun noctilux-theme zone-rainbow xah-find tidy rainbow-mode rainbow-identifiers rainbow-delimiters rainbow-blocks python projectile-git-autofetch projectile-codesearch org multi-web-mode magic-latex-buffer keychain-environment jedi hydandata-light-theme hlinum git-auto-commit-mode flx-isearch flx-ido find-file-in-repository embrace elpy egg diredful dired-rainbow dired-k dired+ clues-theme basic-theme aurora-theme ample-zen-theme alect-themes ac-html ac-emmet)))
  '(plantuml-jar-path "~/.emacs.d/plantuml.jar")
  '(python-shell-interpreter "python3")
  '(save-place t)
@@ -179,6 +182,13 @@
   (setq sql-server "localhost")
   )
 
+;; ;; SQL COMPLETION
+;; (require 'sql-completion)
+;;    (setq sql-interactive-mode-hook
+;;          (lambda ()
+;;            (define-key sql-interactive-mode-map "\t" 'comint-dynamic-complete)
+;;            (sql-mysql-completion-init)))
+  
 ;; SQLUP-MODE
 (use-package sqlup-mode
   :ensure t
@@ -501,7 +511,12 @@
 ;; (use-package indium
 ;;   :ensure t)
 
-
+;; MARKDOWN
+(use-package markdown-mode
+  :ensure t
+  :init
+  (add-hook 'markdown-mode-hook #'visual-line-mode)
+  )
 
 ;;; PYTHON
 (use-package elpy
